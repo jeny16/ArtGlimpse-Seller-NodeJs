@@ -1,3 +1,4 @@
+// Cleaned AddProduct Component without Appwrite (for AWS setup)
 import React, { useState, useEffect } from 'react';
 import {
   Box,
@@ -21,42 +22,33 @@ import {
 import { ImagePlus, Tag, Package2, X, Save } from 'lucide-react';
 import { useTheme } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
-import { createProduct, updateProduct, resetAddProductState } from '../store/addProductSlice';
+import { createProduct, updateProduct, resetProductState  } from '../store/addProductSlice';
 import { FormField } from '../components/index';
-import conf from "../conf/conf";
-import { storage } from '../appwrite/appwriteConfig';
-import { ID, Permission, Role } from 'appwrite';
-import { getImageUrl } from '../appwrite/uploadimage';
+import { fetchCategories } from '../action/categoryService';
 
 const AddProduct = ({ initialValues = null, mode = 'add', onClose }) => {
-  const theme = useTheme();
+   const theme = useTheme();
   const dispatch = useDispatch();
   const { isLoading, error, success } = useSelector((state) => state.addProduct);
 
   const [productData, setProductData] = useState({
-    name: '',
-    description: '',
-    price: '',
-    stock: '',
-    category: '',
-    discount: false,
-    percentage_Discount: '',
-    materials_Made: '',
-    tags: [],
-    valid_Until_Discount: '',
-    processing_Time: '',
-    shipping_Time: '',
-    shipping_Cost: '',
-    estimated_Delivery: '',
+    name: '', description: '', price: '', stock: '', category: '', discount: false,
+    percentage_Discount: '', materials_Made: '', tags: [], valid_Until_Discount: '',
+    processing_Time: '', shipping_Time: '', shipping_Cost: '', estimated_Delivery: '',
     countries_Available: ''
   });
-  // State for new images selected during this session
   const [images, setImages] = useState([]);
-  // State for images that already exist in the product (when editing)
   const [existingImages, setExistingImages] = useState([]);
   const [tagInput, setTagInput] = useState('');
+  const [categories, setCategories] = useState([]);
 
-  // When in edit mode, initialize fields from initialValues.
+  // Fetch categories for dropdown
+  useEffect(() => {
+    fetchCategories()
+      .then(setCategories)
+      .catch((err) => console.error('Failed to load categories', err));
+  }, []);
+
   useEffect(() => {
     if (initialValues) {
       setProductData({
@@ -64,13 +56,11 @@ const AddProduct = ({ initialValues = null, mode = 'add', onClose }) => {
         description: initialValues.description || '',
         price: initialValues.price || '',
         stock: initialValues.stock || '',
-        // If "category" field is missing, fallback to "categories" from model.
-        category: initialValues.category || initialValues.categories || '',
+        category: initialValues.category?._id || '',
         discount: initialValues.discount || false,
         percentage_Discount: initialValues.percentage_Discount || '',
         materials_Made: Array.isArray(initialValues.materials_Made)
-          ? initialValues.materials_Made.join(', ')
-          : initialValues.materials_Made || '',
+          ? initialValues.materials_Made.join(', ') : initialValues.materials_Made || '',
         tags: Array.isArray(initialValues.tags) ? initialValues.tags : [],
         valid_Until_Discount: initialValues.valid_Until_Discount || '',
         processing_Time: initialValues.processing_Time || '',
@@ -78,8 +68,7 @@ const AddProduct = ({ initialValues = null, mode = 'add', onClose }) => {
         shipping_Cost: initialValues.shipping_Cost || '',
         estimated_Delivery: initialValues.estimated_Delivery || '',
         countries_Available: Array.isArray(initialValues.countries_Available)
-          ? initialValues.countries_Available.join(', ')
-          : initialValues.countries_Available || '',
+          ? initialValues.countries_Available.join(', ') : initialValues.countries_Available || '',
         id: initialValues.id
       });
       if (initialValues.images && Array.isArray(initialValues.images)) {
@@ -88,11 +77,8 @@ const AddProduct = ({ initialValues = null, mode = 'add', onClose }) => {
     }
   }, [initialValues]);
 
-  // In edit mode, clear any previous success flag so that previous updates don’t auto-close the modal.
   useEffect(() => {
-    if (mode === 'edit') {
-      dispatch(resetAddProductState());
-    }
+    if (mode === 'edit') dispatch(resetProductState());
   }, [mode, dispatch]);
 
   const handleInputChange = (e) => {
@@ -138,7 +124,6 @@ const AddProduct = ({ initialValues = null, mode = 'add', onClose }) => {
   };
 
   const handleSubmit = async () => {
-    // When discount is off, set default values.
     if (!productData.discount) {
       productData.percentage_Discount = 0;
       if (!productData.valid_Until_Discount) {
@@ -147,113 +132,44 @@ const AddProduct = ({ initialValues = null, mode = 'add', onClose }) => {
     }
 
     if (mode === 'edit' && productData.id) {
-      const materialsArray = productData.materials_Made
-        .split(',')
-        .map(m => m.trim())
-        .filter(m => m.length > 0);
-
-      // If new images are added during edit, upload them.
-      let newImageIds = [];
-      if (images.length > 0) {
-        try {
-          newImageIds = await Promise.all(
-            images.map(async (img) => {
-              const response = await storage.createFile(
-                conf.appwriteBucketId,
-                ID.unique(),
-                img.file,
-                [Permission.read(Role.any())]
-              );
-              return response.$id;
-            })
-          );
-        } catch (uploadError) {
-          console.error('Error uploading new images:', uploadError);
-        }
-      }
-      // Merge new image IDs with existing images.
-      const allImages = [...existingImages, ...newImageIds];
-
       const updateObject = {
-        name: productData.name,
-        description: productData.description,
-        price: productData.price,
-        stock: productData.stock,
-        // Use "categories" as per the model.
-        categories: productData.category,
-        discount: productData.discount,
-        percentage_Discount: productData.percentage_Discount,
-        materials_Made: materialsArray,
-        tags: productData.tags,
-        valid_Until_Discount: productData.valid_Until_Discount,
-        processing_Time: productData.processing_Time,
-        shipping_Time: productData.shipping_Time,
-        shipping_Cost: productData.shipping_Cost,
-        estimated_Delivery: productData.estimated_Delivery,
+        ...productData,
+        materials_Made: productData.materials_Made.split(',').map(m => m.trim()),
         countries_Available: productData.countries_Available.split(',').map(c => c.trim()),
-        images: allImages
+        images: [...existingImages] // Add logic later to upload to AWS
       };
       dispatch(updateProduct({ id: productData.id, update: updateObject }));
     } else {
       const form = new FormData();
-      form.append('name', productData.name);
-      form.append('description', productData.description);
-      form.append('price', productData.price);
-      form.append('stock', productData.stock);
-      form.append('category', productData.category);
-      form.append('discount', productData.discount);
-      form.append('percentage_Discount', productData.percentage_Discount);
-      form.append('valid_Until_Discount', productData.valid_Until_Discount);
-      form.append('processing_Time', productData.processing_Time);
-      form.append('shipping_Time', productData.shipping_Time);
-      form.append('shipping_Cost', productData.shipping_Cost);
-      form.append('estimated_Delivery', productData.estimated_Delivery);
-      form.append('countries_Available', productData.countries_Available);
-
-      const materialsArray = productData.materials_Made
-        .split(',')
-        .map(m => m.trim())
-        .filter(m => m.length > 0);
-      materialsArray.forEach(material => {
-        form.append('materials_Made', material);
+      Object.entries(productData).forEach(([key, value]) => {
+        if (key === 'materials_Made' || key === 'countries_Available') {
+          value.split(',').map(v => v.trim()).forEach(v => form.append(key, v));
+        } else if (key === 'tags') {
+          value.forEach(tag => form.append('tags', tag));
+        } else {
+          form.append(key, value);
+        }
       });
-      productData.tags.forEach(tag => {
-        form.append('tags', tag);
-      });
-      images.forEach((img, index) => {
-        form.append(`image_${index}`, img.file);
-      });
+      images.forEach((img, i) => form.append(`image_${i}`, img.file));
       dispatch(createProduct(form));
     }
   };
 
-  // On success, for edit mode we close the modal, then reset the success flag so that subsequent edits will reopen
   useEffect(() => {
     if (success) {
       if (mode === 'edit' && onClose) {
         onClose();
-        dispatch(resetAddProductState());
+        dispatch(resetProductState ());
       } else {
         setProductData({
-          name: '',
-          description: '',
-          price: '',
-          stock: '',
-          category: '',
-          discount: false,
-          percentage_Discount: '',
-          materials_Made: '',
-          tags: [],
-          valid_Until_Discount: '',
-          processing_Time: '',
-          shipping_Time: '',
-          shipping_Cost: '',
-          estimated_Delivery: '',
+          name: '', description: '', price: '', stock: '', category: '', discount: false,
+          percentage_Discount: '', materials_Made: '', tags: [], valid_Until_Discount: '',
+          processing_Time: '', shipping_Time: '', shipping_Cost: '', estimated_Delivery: '',
           countries_Available: ''
         });
         setImages([]);
         setExistingImages([]);
-        dispatch(resetAddProductState());
+        dispatch(resetProductState ());
       }
     }
   }, [success, dispatch, mode, onClose]);
@@ -335,9 +251,9 @@ const AddProduct = ({ initialValues = null, mode = 'add', onClose }) => {
                         required
                         label="Category"
                       >
-                        <MenuItem value="Jewelry & Accessories">Jewelry & Accessories</MenuItem>
-                        <MenuItem value="Clothing">Clothing</MenuItem>
-                        <MenuItem value="Home & Living">Home & Living</MenuItem>
+                         {categories.map(cat => (
+                      <MenuItem key={cat._id} value={cat._id}>{cat.name}</MenuItem>
+                       ))}
                       </Select>
                     </FormControl>
                   </Grid>

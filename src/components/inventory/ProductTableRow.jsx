@@ -32,7 +32,7 @@ import {
     NAME_MAX_LENGTH,
     formatCurrency
 } from '../index';
-import { getImageUrl } from '../../appwrite/uploadimage';
+// import { getImageUrl } from '../../appwrite/uploadimage';
 
 const getStatusIcon = (status) => {
     switch (status) {
@@ -103,7 +103,7 @@ const ProductTableRow = ({
                         variant="rounded"
                         src={
                             product.images && product.images.length > 0
-                                ? getImageUrl(product.images[0])
+                                ? "none"
                                 : undefined
                         }
                         sx={{ width: 50, height: 50 }}

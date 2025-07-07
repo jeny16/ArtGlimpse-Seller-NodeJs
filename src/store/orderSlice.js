@@ -16,7 +16,7 @@ const extractId = (idField) => {
 export const fetchOrders = createAsyncThunk("orders/fetch", async (_, thunkAPI) => {
   try {
     const orders = await orderService.fetchOrders();
-    console.log("response inside fetchOrders:", orders);
+    // console.log("response inside fetchOrders:", orders);
     return orders; // ✅ only array of orders
   } catch (error) {
     return thunkAPI.rejectWithValue(

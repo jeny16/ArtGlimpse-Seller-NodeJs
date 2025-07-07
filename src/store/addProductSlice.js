@@ -1,32 +1,45 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import {
   createProductAPI,
-  updateProductAPI
+  updateProductAPI,
+  deleteProductAPI
 } from '../action/productService';
 
+// Thunks
 export const createProduct = createAsyncThunk(
-  'product/createProduct',
+  'product/create',
   async (formData, thunkAPI) => {
     try {
       return await createProductAPI(formData);
     } catch (err) {
-      return thunkAPI.rejectWithValue(err.message || 'Failed to add product');
+      return thunkAPI.rejectWithValue(err.response?.data || err.message);
     }
   }
 );
 
 export const updateProduct = createAsyncThunk(
-  'product/updateProduct',
+  'product/update',
   async ({ id, update }, thunkAPI) => {
     try {
       return await updateProductAPI(id, update);
     } catch (err) {
-      return thunkAPI.rejectWithValue(err.message || 'Failed to update product');
+      return thunkAPI.rejectWithValue(err.response?.data || err.message);
     }
   }
 );
 
-const addProductSlice = createSlice({
+export const deleteProduct = createAsyncThunk(
+  'product/delete',
+  async (id, thunkAPI) => {
+    try {
+      return await deleteProductAPI(id);
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err.response?.data || err.message);
+    }
+  }
+);
+
+const slice = createSlice({
   name: 'product',
   initialState: {
     product: null,
@@ -35,7 +48,7 @@ const addProductSlice = createSlice({
     success: false
   },
   reducers: {
-    resetAddProductState: (state) => {
+    resetProductState(state) {
       state.product = null;
       state.isLoading = false;
       state.error = null;
@@ -44,15 +57,29 @@ const addProductSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // CREATE
       .addCase(createProduct.pending, (s) => { s.isLoading = true; s.error = null; s.success = false; })
       .addCase(createProduct.fulfilled, (s, a) => { s.product = a.payload; s.isLoading = false; s.success = true; })
-      .addCase(createProduct.rejected, (s, a) => { s.isLoading = false; s.error = a.payload; })
+      .addCase(createProduct.rejected,  (s, a) => { s.isLoading = false; s.error = a.payload; })
 
+      // UPDATE
       .addCase(updateProduct.pending, (s) => { s.isLoading = true; s.error = null; s.success = false; })
       .addCase(updateProduct.fulfilled, (s, a) => { s.product = a.payload; s.isLoading = false; s.success = true; })
-      .addCase(updateProduct.rejected, (s, a) => { s.isLoading = false; s.error = a.payload; });
+      .addCase(updateProduct.rejected,  (s, a) => { s.isLoading = false; s.error = a.payload; })
+
+      // DELETE
+      .addCase(deleteProduct.pending, (s) => { s.isLoading = true; s.error = null; s.success = false; })
+      .addCase(deleteProduct.fulfilled, (s, a) => {
+        s.isLoading = false;
+        s.success = true;
+        // optionally clear s.product if the deleted one was loaded
+        if (s.product && s.product.id === a.meta.arg) {
+          s.product = null;
+        }
+      })
+      .addCase(deleteProduct.rejected, (s, a) => { s.isLoading = false; s.error = a.payload; });
   }
 });
 
-export const { resetAddProductState } = addProductSlice.actions;
-export default addProductSlice.reducer;
+export const { resetProductState } = slice.actions;
+export default slice.reducer;
