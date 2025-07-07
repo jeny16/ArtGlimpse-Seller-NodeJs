@@ -102,9 +102,7 @@ const ProductTableRow = ({
                     <Avatar
                         variant="rounded"
                         src={
-                            product.images && product.images.length > 0
-                                ? "none"
-                                : undefined
+                            product.images
                         }
                         sx={{ width: 50, height: 50 }}
                     >

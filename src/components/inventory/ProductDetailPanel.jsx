@@ -40,7 +40,6 @@ import {
     VerifiedUser as VerifiedIcon
 } from '@mui/icons-material';
 import { formatCurrency, formatDate, daysUntil } from '../index';
-// import { getImageUrl } from '../../appwrite/uploadimage';
 
 const DetailItem = ({ icon, label, value }) => {
     const theme = useTheme();
@@ -125,7 +124,7 @@ const ProductDetailPanel = ({ product, onClose, open }) => {
     if (!product) return null;
 
     // Normalize images through Appwrite helper
-    const images = (product.images || []).map();
+    const images = product.images || [];
 
     // Check if discount is still valid
     const now = new Date();
