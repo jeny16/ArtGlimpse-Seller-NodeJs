@@ -64,7 +64,7 @@ const ProductTableRow = ({
 }) => {
     const theme = useTheme();
     const productStatus = getProductStatus(product.stock);
-
+    // console.log("product", product);
     // Truncate long names
     const truncatedName = product.name.length > NAME_MAX_LENGTH
         ? `${product.name.substring(0, NAME_MAX_LENGTH)}...`
@@ -145,7 +145,7 @@ const ProductTableRow = ({
                 {isEditing ? (
                     <TextField
                         size="small"
-                        value={editedValues?.categories || product.categories || ""}
+                        value={editedValues?.category.name || product.category.name || ""}
                         onChange={(e) => handleFieldChange("categories", e.target.value)}
                         variant="outlined"
                         fullWidth
@@ -153,7 +153,7 @@ const ProductTableRow = ({
                 ) : (
                     <Chip
                         icon={<CategoryIcon />}
-                        label={product.categories || "Uncategorized"}
+                        label={product.category.name || "Uncategorized"}
                         size="small"
                         variant="outlined"
                         sx={{

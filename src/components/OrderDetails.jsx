@@ -37,7 +37,7 @@ const OrderDetails = ({
   const theme = useTheme();
   // Local state to hold the updated status
   const [selectedStatus, setSelectedStatus] = useState(order.status || "");
-
+  // console.log("orderdetails order::", order);
   useEffect(() => {
     // Reset the local status state if order changes
     setSelectedStatus(order.status || "");
@@ -199,7 +199,7 @@ const OrderDetails = ({
                             : "none",
                       }}
                     >
-                      <ProductCard item={item} />
+                      <ProductCard key={item._id} item={item} />
                     </Box>
                   ))
                 ) : (

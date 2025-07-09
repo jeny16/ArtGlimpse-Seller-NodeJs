@@ -47,10 +47,13 @@ const RecentOrders = () => {
   };
 
   const sortedOrders = [...orders]
-    .filter((order) => order.orderStatus === "New") // Filter only 'New' orders
+    .filter((order) => order.status === "New")
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  // console.log("orders", orders)
+  
+    // console.log("sorted orders", sortedOrders)
 
-  const displayedOrders = sortedOrders.slice(0, 4); // Display up to 4 new orders
+  const displayedOrders = sortedOrders.slice(0, 4);
 
   return (
     <Box
@@ -195,7 +198,7 @@ const RecentOrders = () => {
                       </Grid>
                       <Grid item xs={12} sm={2} sx={{ textAlign: "right" }}>
                         <Chip
-                          label={order.orderStatus || "Unknown Status"}
+                          label={order.status || "Unknown Status"}
                           size="small"
                           color="primary"
                         />

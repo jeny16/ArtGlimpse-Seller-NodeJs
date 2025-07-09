@@ -5,7 +5,9 @@ import { useTheme } from "@mui/material/styles";
 
 const ProductCard = ({ item }) => {
     const theme = useTheme();
-    const product = item.productData;
+    const product = item.productId;
+    // console.log("item in pd page::", item);
+    // console.log("product::",product);
 
     return (
         <Card
@@ -23,10 +25,10 @@ const ProductCard = ({ item }) => {
                 component="img"
                 src={
                     product.images && product.images.length > 0
-                        ? "None"
+                        ? product.images
                         : "/api/placeholder/120/160"
                 }
-                alt={product.name}
+                alt={product?.name}
                 sx={{
                     width: 100,
                     height: 140,
@@ -61,7 +63,7 @@ const ProductCard = ({ item }) => {
 
                 <Stack spacing={theme.spacing(0.5)} mt={theme.spacing(1)}>
                     <Typography variant="body2">
-                        Price: ₹{product.price.toFixed(2)}
+                        Price: ₹{product?.price?.toFixed(2)}
                     </Typography>
                     <Typography variant="body2">
                         Qty: {item.quantity}

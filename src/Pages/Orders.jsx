@@ -86,7 +86,7 @@ const OrderManagement = () => {
   }, [orders, currentTab, tabLabels, searchTerm]);
 
   const handleRowClick = (order) => {
-    navigate(`/orders/${order.id}`);
+    navigate(`/orders/${order._id}`);
   };
 
   if (loading) {

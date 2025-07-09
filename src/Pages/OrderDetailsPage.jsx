@@ -19,7 +19,7 @@ const OrderDetailsPage = () => {
         }
     }, [dispatch, orders.length]);
 
-    const order = orders.find((o) => o.id === orderId);
+    const order = orders.find((o) => o._id === orderId);
 
     if (!order) {
         return (

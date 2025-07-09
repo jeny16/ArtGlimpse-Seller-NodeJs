@@ -43,14 +43,7 @@ const router = createBrowserRouter([
         index: true,
         element: <RedirectRoot />,
       },
-      {
-        path: "/dashboard",
-        element: (
-          <AuthLayout authentication={true}>
-            <HomeDashBoard />
-          </AuthLayout>
-        ),
-      },
+      // 🔓 PUBLIC PAGE
       {
         path: "/home",
         element: (
@@ -59,11 +52,8 @@ const router = createBrowserRouter([
           </AuthLayout>
         ),
       },
-      { path: "/add-product", element: <AddProduct /> },
-      { path: "/analytics", element: <Analytics /> },
-      { path: "/inventory", element: <Inventory /> },
-      { path: "/orders", element: <OrderManagement /> },
-      { path: "/orders/:orderId", element: <OrderDetailsPage /> },
+
+      // 🔐 LOGIN/REGISTER PAGES
       {
         path: "/login",
         element: (
@@ -80,7 +70,58 @@ const router = createBrowserRouter([
           </AuthLayout>
         ),
       },
-      // Seller Profile Routes
+
+      // 🔐 ALL PROTECTED ROUTES BELOW
+      {
+        path: "/dashboard",
+        element: (
+          <AuthLayout authentication={true}>
+            <HomeDashBoard />
+          </AuthLayout>
+        ),
+      },
+      {
+        path: "/add-product",
+        element: (
+          <AuthLayout authentication={true}>
+            <AddProduct />
+          </AuthLayout>
+        ),
+      },
+      {
+        path: "/analytics",
+        element: (
+          <AuthLayout authentication={true}>
+            <Analytics />
+          </AuthLayout>
+        ),
+      },
+      {
+        path: "/inventory",
+        element: (
+          <AuthLayout authentication={true}>
+            <Inventory />
+          </AuthLayout>
+        ),
+      },
+      {
+        path: "/orders",
+        element: (
+          <AuthLayout authentication={true}>
+            <OrderManagement />
+          </AuthLayout>
+        ),
+      },
+      {
+        path: "/orders/:orderId",
+        element: (
+          <AuthLayout authentication={true}>
+            <OrderDetailsPage />
+          </AuthLayout>
+        ),
+      },
+
+      // 🔐 PROFILE + NESTED ROUTES
       {
         path: "/profile",
         element: (
@@ -89,13 +130,13 @@ const router = createBrowserRouter([
           </AuthLayout>
         ),
         children: [
-          { index: true, element: <SellerProfile /> }, // default seller profile details
+          { index: true, element: <SellerProfile /> },
           { path: "store-details", element: <StoreDetails /> },
           { path: "payment-details", element: <PaymentDetails /> },
           { path: "delete", element: <DeleteAccount /> },
           { path: "terms", element: <TermsAndConditions /> },
-          { path: "privacy", element: <Privacy /> }
-        ]
+          { path: "privacy", element: <Privacy /> },
+        ],
       },
     ],
   },

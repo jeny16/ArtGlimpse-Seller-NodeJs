@@ -50,7 +50,7 @@ const Inventory = () => {
   // Fetch inventory on component mount
   useEffect(() => {
     const userData = localStorage.getItem("seller");
-    console.log("seller data :::", userData);
+    // console.log("seller data :::", userData);
     if (userData) {
       const user = JSON.parse(userData);
       const sellerId = user.userId;
@@ -83,7 +83,7 @@ const Inventory = () => {
       if (searchTerm) {
         results = results.filter(product =>
           product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          (product.categories && product.categories.toLowerCase().includes(searchTerm.toLowerCase())) ||
+          (product.category.name && product.category.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
           (product.tags && product.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase())))
         );
       }
@@ -129,7 +129,7 @@ const Inventory = () => {
 
   // Edit product in modal
   const handleEditProductClick = (product) => {
-    console.log("product to edit:", product);
+    // console.log("product to edit:", product);
     setProductToEdit(product);
     setEditModalOpen(true);
   };
@@ -154,10 +154,23 @@ const Inventory = () => {
     if (productToDelete) {
       dispatch(deleteProduct(productToDelete.id))
         .then(() => {
-          showNotification(`${productToDelete.name} has been deleted successfully.`);
+          showNotification(
+            `${productToDelete.name} has been deleted successfully.`
+          );
+          const userData = localStorage.getItem("seller");
+          if (userData) {
+            const sellerId =
+              JSON.parse(userData).sellerId || JSON.parse(userData).userId;
+            if (sellerId) {
+              dispatch(fetchInventory(sellerId));
+            }
+          }
         })
         .catch(() => {
-          showNotification("Failed to delete product. Please try again.", "error");
+          showNotification(
+            "Failed to delete product. Please try again.",
+            "error"
+          );
         });
       setDeleteDialogOpen(false);
       setProductToDelete(null);
@@ -350,6 +363,7 @@ const Inventory = () => {
             initialValues={productToEdit}
             mode="edit"
             onClose={handleCloseEditModal}
+            // showNotification={showNotification}
           />
         </Box>
       </Modal>

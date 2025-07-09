@@ -15,6 +15,7 @@ const orderService = {
         Authorization: `Bearer ${token}`,
       },
     });
+    // console.log("resp fro API", response.data.orders);
     return response.data.orders; // ✅ return only the array of orders
   },
 

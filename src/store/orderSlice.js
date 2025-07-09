@@ -63,8 +63,8 @@ const orderSlice = createSlice({
           id: extractId(order.id),
           sellerId: order.sellerId ? extractId(order.sellerId) : null,
           userId: extractId(order.userId),
-          status: order.orderStatus
-            ? order.orderStatus
+          status: order.status
+            ? order.status
             : order.paymentStatus === "PAID"
             ? "New"
             : "Processing",
@@ -73,7 +73,7 @@ const orderSlice = createSlice({
             : null,
           items: order.items.map((item) => ({
             ...item,
-            productId: extractId(item.productId),
+            productId: item.productId,
             orderRef: order.orderRef,
           })),
         }));

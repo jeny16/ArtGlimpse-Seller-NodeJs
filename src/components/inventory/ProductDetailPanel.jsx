@@ -327,7 +327,7 @@ const ProductDetailPanel = ({ product, onClose, open }) => {
                                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, flexWrap: 'wrap', gap: 1 }}>
                                     <Chip
                                         icon={<CategoryIcon sx={{ fontSize: '1rem' }} />}
-                                        label={product.categories || "Uncategorized"}
+                                        label={product.category.name || "Uncategorized"}
                                         size="small"
                                         sx={{
                                             bgcolor: theme.palette.custom.highlight + '10',
