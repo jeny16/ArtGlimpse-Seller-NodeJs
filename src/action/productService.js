@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE = 'http://localhost:3000/api/products';
+const API_BASE = import.meta.env.VITE_API_PRODUCTS_URL || 'http://localhost:3000/api/products';
 
 export async function createProductAPI(formData) {
   const stored = JSON.parse(localStorage.getItem('seller') || '{}');

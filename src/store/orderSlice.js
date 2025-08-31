@@ -60,7 +60,7 @@ const orderSlice = createSlice({
 
         state.orders = orders.map((order) => ({
           ...order,
-          id: extractId(order.id),
+          id: extractId(order.id || order._id),
           sellerId: order.sellerId ? extractId(order.sellerId) : null,
           userId: extractId(order.userId),
           status: order.status

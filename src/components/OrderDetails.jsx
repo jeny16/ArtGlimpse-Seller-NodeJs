@@ -24,7 +24,7 @@ import PrintIcon from "@mui/icons-material/Print";
 import EmailIcon from "@mui/icons-material/Email";
 import PhoneIcon from "@mui/icons-material/Phone";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
-import { ORDER_STATUS, getStatusChip, isValidTransition } from "./index";
+import { ORDER_STATUS, getStatusChip, isValidTransition, allowedTransitions } from "./index";
 import ProductCard from "./ProductCard";
 import { useTheme } from "@mui/material/styles";
 import { toast } from "react-toastify";
@@ -42,6 +42,7 @@ const OrderDetails = ({
     // Reset the local status state if order changes
     setSelectedStatus(order.status || "");
   }, [order]);
+  console.log("order::", order);
 
   if (!order) return null;
 
@@ -510,7 +511,6 @@ const OrderDetails = ({
                         borderRadius: 2,
                         mt: 0.5,
                         boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
-
                         "& .MuiOutlinedInput-notchedOutline": {
                           borderColor: theme.palette.custom.highlight,
                         },
@@ -524,39 +524,49 @@ const OrderDetails = ({
                     },
                   }}
                 >
-                  {Object.values(ORDER_STATUS).map((status) => (
-                    <MenuItem
-                      key={`status-option-${status.value}`}
-                      value={status.value}
-                      sx={{
-                        py: 1.5,
-                        "&:not(:last-child)": {
-                          borderBottom: `1px solid ${theme.palette.shades.light}`,
-                        },
-                      }}
-                    >
-                      <Box
+                  {/* Only allow current status and valid forward transitions */}
+                  {Object.values(ORDER_STATUS)
+                    .filter((status) => {
+                      if (status.value === order.status) return true;
+                      // Only allow valid transitions (not reverse)
+                      return isValidTransition(order.status, status.value, order) &&
+                        allowedTransitions[order.status]?.indexOf(status.value) > -1 &&
+                        Object.keys(ORDER_STATUS).findIndex(k => ORDER_STATUS[k].value === status.value) >=
+                        Object.keys(ORDER_STATUS).findIndex(k => ORDER_STATUS[k].value === order.status);
+                    })
+                    .map((status) => (
+                      <MenuItem
+                        key={`status-option-${status.value}`}
+                        value={status.value}
                         sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          width: "100%",
+                          py: 1.5,
+                          "&:not(:last-child)": {
+                            borderBottom: `1px solid ${theme.palette.shades.light}`,
+                          },
                         }}
                       >
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                          <Box sx={{ color: `${status.color}.main`, mr: 1.5 }}>
-                            {status.icon}
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            width: "100%",
+                          }}
+                        >
+                          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                            <Box sx={{ color: `${status.color}.main`, mr: 1.5 }}>
+                              {status.icon}
+                            </Box>
+                            <Typography variant="body2" fontWeight="500">
+                              {status.value}
+                            </Typography>
                           </Box>
-                          <Typography variant="body2" fontWeight="500">
-                            {status.value}
+                          <Typography variant="caption" color="text.secondary" sx={{ ml: 2 }}>
+                            {status.description}
                           </Typography>
                         </Box>
-                        <Typography variant="caption" color="text.secondary" sx={{ ml: 2 }}>
-                          {status.description}
-                        </Typography>
-                      </Box>
-                    </MenuItem>
-                  ))}
+                      </MenuItem>
+                    ))}
                 </Select>
               </FormControl>
               <Box

@@ -1,6 +1,6 @@
 // src/action/orderService.js
 import axios from './api';
-const API_URL = 'http://localhost:3000/api/orders';
+const API_URL = import.meta.env.VITE_API_ORDERS_URL || 'http://localhost:3000/api/orders';
 
 const orderService = {
   fetchOrders: async () => {

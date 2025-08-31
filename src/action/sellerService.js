@@ -1,5 +1,5 @@
 import axios from './api'; // using the configured axios instance
-const API_URL = 'http://localhost:3000/api/seller';
+const API_URL = import.meta.env.VITE_API_SELLER_URL || 'http://localhost:3000/api/seller';
 
 const sellerService = {
     getProfile: async (sellerId) => {

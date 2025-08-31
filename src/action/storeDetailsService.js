@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:3000/api/seller/store';
+const BASE_URL = import.meta.env.VITE_API_STORE_URL || 'http://localhost:3000/api/seller/store';
 
 const storeDetailsService = {
     // Fetch store details for a seller using their ID (passed as userId to backend)

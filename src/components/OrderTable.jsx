@@ -108,9 +108,7 @@ const OrderTable = ({ orders, page, rowsPerPage, onRowClick, onStatusChange }) =
                             const orderItems = order.items || [];
                             const orderDate = order.createdAt || "N/A";
                             const orderTotal = calculateTotal(orderItems);
-                            const orderStatus =
-                                order.status ||
-                                (order.paymentStatus === "PAID" ? "New" : "Processing");
+                            const orderStatus = order.status;
                             const paymentStatus = order.paymentStatus || "Pending";
 
                             return (
