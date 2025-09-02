@@ -6,7 +6,7 @@ const authService = {
     // Seller login (uses dedicated seller endpoint)
     sellerLogin: async (email, password) => {
         try {
-            const response = await axios.post(`${API_URL}/seller/login`, { 
+            const response = await axios.post(`${API_URL}/auth/seller/login`, { 
                 email, 
                 password    
             });
@@ -22,7 +22,7 @@ const authService = {
     // Seller signup (uses dedicated seller endpoint)
     sellerSignup: async (username, email, password) => {
         try {
-            const response = await axios.post(`${API_URL}/seller/signup`, {
+            const response = await axios.post(`${API_URL}/auth/seller/signup`, {
                 username,
                 email,
                 password
