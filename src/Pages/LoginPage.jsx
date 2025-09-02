@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import { Login } from '../Components';
+import { Login } from '../components';
 
 const LoginPage = () => {
     return (
