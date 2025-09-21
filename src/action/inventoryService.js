@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_PRODUCTS_URL || "http://localhost:3000/api/products";
+const API_URL = `${import.meta.env.VITE_API_URL}/products` || "http://localhost:3000/api/products";
 
 const inventoryService = {
   // Fetch inventory for the logged‑in seller by path‑param
